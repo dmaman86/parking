@@ -1,0 +1,28 @@
+<!--<p>
+  home-user works!
+</p>-->
+
+<div>
+  <h3>Where are you parking? </h3>
+  <div style="display: -webkit-box">
+    <h4>Search Parking</h4>
+    <select id="park">
+      <option *ngFor="let park of parkings">{{ park.parkingAreaName }}</option>
+    </select>
+    &nbsp;&nbsp;&nbsp;
+    <h4>Select Day</h4>
+    <select id="day">
+      <option *ngFor="let day of days">{{ day }}</option>
+    </select>
+    &nbsp;&nbsp;&nbsp;
+    <h4>Parking strat</h4>
+    <input type="time" id="startParking">
+    &nbsp;&nbsp;&nbsp;
+    <h4>Parking end</h4>
+    <input type="time" id="endParking">
+  </div>
+  <div id="listToPay">
+
+  </div>
+  <input type="button" (click)="searchToPay()" class="btn btn-primary" value="To Pay"/>
+</div>

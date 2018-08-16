@@ -1,0 +1,6 @@
+{
+    "ravendb": {
+        "url": "http://localhost:8080",
+        "database": "testerDB"
+    }
+}

@@ -1,0 +1,106 @@
+<h1>{{ title }}</h1>
+<hr>
+<div>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col"></th>
+        <th scope="col">Area Name</th>
+        <th scope="col">WeekDaysHourlyRate</th>
+        <th scope="col">WeekendHourlyRate</th>
+        <th scope="col">DiscountPercentage</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let parking of parkings; let i = index">
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ parking.parkingAreaName }}</td>
+        <td>{{ parking.weekDaysHourlyRate }}</td>
+        <td>{{ parking.weekendHourlyRate }}</td>
+        <td>{{ parking.discountPercentage }}</td>
+        <td>
+          <input type="button" (click)="editParking( parking._id )"
+            class="btn btn-primary" value="Edit"/>
+          <input type="button" (click)="deleteParking( parking._id )"
+            class="btn btn-danger" value="Delete"/>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <input type="button" (click)="addParking()"
+            class="btn btn-primary" value="Add"/>
+</div>
+
+<div *ngIf="status == 'edit'">
+  <form #parkingEdit="ngForm" (ngSubmit)="onSubmit()">
+    <p>
+      <label>Parking Area Name</label>
+      <label>{{ park.parkingAreaName }}</label>
+    </p>
+    <p>
+      <label>Week Day Hourly Rate</label>
+      <input
+        type="text"
+        name="weekDaysHourlyRate"
+        #weekDaysHourlyRate="ngModel"
+        [(ngModel)]="park.weekDaysHourlyRate"/>
+    </p>
+    <p>
+      <label>Weekend Hourly Rate</label>
+      <input
+        type="text"
+        name="weekendHourlyRate"
+        #weekendHourlyRate="ngModel"
+        [(ngModel)]="park.weekendHourlyRate"/>
+    </p>
+    <p>
+      <label>Discount Percentage</label>
+      <input
+        type="text"
+        name="discountPercentage"
+        #discountPercentage="ngModel"
+        [(ngModel)]="park.discountPercentage"/>
+    </p>
+    <input type="submit" value="Send" class="btn btn-danger" [disabled]="!parkingEdit.form.valid" />
+  </form>
+</div>
+
+<div *ngIf="status == 'add'">
+    <form #parkingAdd="ngForm" (ngSubmit)="uploadNewParking()">
+      <p>
+        <label>Parking Area Name</label>
+        <input
+          type="text"
+          name="parkingAreaName"
+          #parkingAreaName="ngModel"
+          [(ngModel)]="park.parkingAreaName"/>
+      </p>
+      <p>
+        <label>Week Day Hourly Rate</label>
+        <input
+          type="text"
+          name="weekDaysHourlyRate"
+          #weekDaysHourlyRate="ngModel"
+          [(ngModel)]="park.weekDaysHourlyRate"/>
+      </p>
+      <p>
+        <label>Weekend Hourly Rate</label>
+        <input
+          type="text"
+          name="weekendHourlyRate"
+          #weekendHourlyRate="ngModel"
+          [(ngModel)]="park.weekendHourlyRate"/>
+      </p>
+      <p>
+        <label>Discount Percentage</label>
+        <input
+          type="text"
+          name="discountPercentage"
+          #discountPercentage="ngModel"
+          [(ngModel)]="park.discountPercentage"/>
+      </p>
+      <input type="submit" value="Send" class="btn btn-danger" [disabled]="!parkingAdd.form.valid" />
+    </form>
+  </div>

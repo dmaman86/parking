@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { UserService } from '../../services/user.service';
-import { Parking } from '../../models/parking';
+import { NewParking } from '../../models/newParking';
+import { ToPay } from '../../models/toPay';
 
 @Component({
   selector: 'app-home-user',
@@ -11,14 +12,19 @@ import { Parking } from '../../models/parking';
 export class HomeUserComponent implements OnInit {
 
   public days: any[];
-  public parking: Parking;
-  public parkings: Parking[];
+  public parking: NewParking;
+  public parkings: NewParking[];
   public areaName;
   public dayParking;
   public startParking;
   public endParking;
   public totalToPay;
   public status: string;
+  public toPay: ToPay;
+  public time;
+  public id;
+  public discount;
+  public mount;
 
   constructor(
     private _route: ActivatedRoute,
@@ -35,15 +41,14 @@ export class HomeUserComponent implements OnInit {
         for (let i = 0; i < response.item.parkings.length; i++) {
           const temp_park = response.item.parkings[i];
           console.log( temp_park);
-          this.parkings[i] = new Parking();
           const array_id: any[] = temp_park.id.split('/');
           console.log( array_id );
-          this.parkings[i].setId( array_id[1] );
-          this.parkings[i].setParkingAreaName(temp_park.parkingAreaName);
-          this.parkings[i].setWeekDaysHourlyRate(temp_park.weekDaysHourlyRate);
-          this.parkings[i].setWeekendHourlyRate(temp_park.weekendHourlyRate);
-          this.parkings[i].setDiscountPercentage(temp_park.discountPercentage);
+          this.parkings[i] = new NewParking(
+            array_id[1], temp_park.parkingAreaName, temp_park.weekDaysHourlyRate, temp_park.weekendHourlyRate, temp_park.discountPercentage
+          );
         }
+
+        console.log( this.parkings );
       }, error => {
         const errorMensage = <any>error;
         console.log(errorMensage);
@@ -54,87 +59,49 @@ export class HomeUserComponent implements OnInit {
     );
   }
 
-  searchToPay() {
-    let i = 0;
-    let list: HTMLElement = document.getElementById('listToPay');
-    if ( list.style.display === 'block' ) {
-      let lis = document.getElementById('myUL');
-      console.log( lis );
-      while ( lis.hasChildNodes() ) {
-        lis.removeChild( lis.childNodes[i] );
-      }
-      list.removeChild( lis );
-    } else {
-      list.style.display = 'block';
-    }
-
-    list.style.height = '200px';
-    list.style.width = '30%';
-    list.style.marginLeft = '20px';
-    let first: HTMLElement = document.createElement('UL');
-    first.setAttribute( 'id', 'myUL' );
-    list.appendChild( first );
-
+  searchToPay(  ) {
+    this.status = 'pay';
     this.areaName = (<HTMLInputElement>document.getElementById('park')).value;
-    this.dayParking = (<HTMLInputElement>document.getElementById('day')).value;
-
-    // console.log( park.value, day.value );
-    const listPay = [];
+    console.log( this.areaName );
 
     for ( let j = 0; j < this.parkings.length; j++ ) {
-      if ( this.parkings[j].getParkingAreaName() === this.areaName ){
-        this.parking = this.parkings[j];
-        console.log( this.parking );
-
+      if ( this.parkings[j].getParkingAreaName() === this.areaName ) {
+        this.id = this.parkings[j].getID();
         this.startParking = (<HTMLInputElement>document.getElementById('startParking')).value;
         this.endParking = (<HTMLInputElement>document.getElementById('endParking')).value;
-
-        // console.log(startTime, endTime );
-
-        listPay.push( this.areaName );
-        listPay.push( this.dayParking );
-        listPay.push( this.startParking );
-        listPay.push( this.endParking );
+        this.dayParking = (<HTMLInputElement>document.getElementById('day')).value;
+        if (  this.days.indexOf( this.dayParking ) > 1 && this.days.indexOf( this.dayParking ) < 6) {
+          this.mount = this.parkings[j].getWeekDaysHourlyRate();
+        } else {
+          this.mount = this.parkings[j].getWeekendHourlyRate();
+        }
+        this.discount = this.parkings[j].getDiscountPercentage();
       }
     }
 
-    console.log( listPay );
-    let j = 0;
-    for ( ; j < listPay.length; j++) {
-      const node: HTMLElement = document.createElement('LI');
-      const textNode: Text = document.createTextNode( listPay[j] );
-      node.appendChild( textNode );
-      document.getElementById( 'myUL' ).appendChild( node );
+    if ( this.endParking > this.startParking ) {
+      this.time = this.timeStringToFloat(this.endParking) - this.timeStringToFloat(this.startParking);
+    } else {
+      alert('check again the time');
+      this.status = '';
     }
 
-    if ( this.days.indexOf( this.dayParking ) > 1 && this.days.indexOf( this.dayParking ) < 6 ) {
-      const total_time = this.devolverMinutos(this.endParking) - this.devolverMinutos(this.startParking);
-      console.log(' you are in if ');
-      console.log(  total_time );
-      const perhour: number = parseInt( this.parking.getWeekDaysHourlyRate() );
-      const befourDiscont = perhour * ( total_time / 60 );
-      const totalPay = befourDiscont - ( befourDiscont * parseInt(this.parking.getDiscountPercentage()) );
-      const node: HTMLElement = document.createElement('LI');
-      const textNode: Text = document.createTextNode( totalPay.toString() );
-      node.appendChild( textNode );
-      document.getElementById( 'myUL' ).appendChild( node );
-    } else {
-      const total_time = this.devolverMinutos(this.endParking) - this.devolverMinutos(this.startParking);
-      console.log(' you are in else ');
-      console.log(  total_time );
-      const perhour: number = parseInt( this.parking.getWeekendHourlyRate() );
-      const befourDiscont = perhour * ( total_time / 60 );
-      const totalPay = befourDiscont - ( befourDiscont * this.parking.getDiscountPercentage() );
-      const node: HTMLElement = document.createElement('LI');
-      const textNode: Text = document.createTextNode( totalPay.toString() );
-      node.appendChild( textNode );
-      document.getElementById( 'myUL' ).appendChild( node );
-    }
+    console.log( this.time * this.mount );
+    const befourDiscont = this.time * this.mount;
+
+    this.totalToPay = befourDiscont - ( befourDiscont * this.discount );
+
+    console.log( this.totalToPay );
+
+    console.log( this.mount, this.id, this.discount );
+    this.toPay = new ToPay(this.areaName, this.dayParking, this.startParking, this.endParking, this.totalToPay);
   }
 
-  devolverMinutos( horaMinutos ) {
-    return ( parseInt ( horaMinutos.split(':')[0] ) * 60) 
-          + parseInt ( horaMinutos.split(':')[1] ) ;
+  timeStringToFloat(time) {
+    const hoursMinutes = time.split(/[.:]/);
+    const hours = parseInt(hoursMinutes[0], 10);
+    const minutes = hoursMinutes[1] ? parseInt(hoursMinutes[1], 10) : 0;
+    return hours + minutes / 60;
   }
 
 }

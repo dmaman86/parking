@@ -1,6 +1,3 @@
-<!--<p>
-  home-user works!
-</p>-->
 
 <div>
   <h3>Where are you parking? </h3>
@@ -21,8 +18,28 @@
     <h4>Parking end</h4>
     <input type="time" id="endParking">
   </div>
-  <div id="listToPay">
-
-  </div>
   <input type="button" (click)="searchToPay()" class="btn btn-primary" value="To Pay"/>
+  <div id="listToPay" *ngIf="status == 'pay'">
+    <p>
+      <label>Parking Area Name: </label>
+      <label>{{ toPay.areaName }}</label>
+    </p>
+    <p>
+      <label>Day: </label>
+      <label>{{ toPay.dayParking }}</label>
+    </p>
+    <p>
+      <label>Start Hour: </label>
+      <label>{{ toPay.startTime }}</label>
+    </p>
+    <p>
+      <label>End Hour: </label>
+      <label>{{ toPay.endTime }}</label>
+    </p>
+    <p>
+      <label>To Pay: </label>
+      <label>{{ toPay.toPay }}</label>
+    </p>
+  </div>
+  
 </div>
